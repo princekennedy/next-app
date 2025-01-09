@@ -1,5 +1,7 @@
 
 "use client"
+import Banner from '@/components/Banner';
+import Promo from '@/components/Promo';
 import SideNav from '@/components/SideNav'
 import React, { useState } from 'react'
 
@@ -22,7 +24,7 @@ const GetStartedPage = () => {
         {/* Main Content */}
 
         <div className="flex-1 p-6 bg-gray-100">
-
+          <Banner message="A CUSTOM GOLF CLUB FITTING.YOUR GAME’S GAME-CHANGER." backgroundImage="/assets/fit-banner1.jpg" />
           <div className="getting-started-message p-4 border rounded shadow-lg">
             <h2 className="text-xl font-bold mb-2">Getting Started</h2>
             {isEditing ? (

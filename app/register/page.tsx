@@ -7,9 +7,11 @@ export default function Register() {
 
   return (
     <>
+      <div style={{backgroundImage: 'url(/assets/fit-banner1.jpg)'}}>
         <Topnav></Topnav>
         <RegisterForm></RegisterForm>
-        <Footer></Footer>
+      </div>
+       <Footer></Footer>
     </>
   );
 };

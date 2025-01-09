@@ -46,7 +46,7 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div style={styles.cover}>
+    <div style={styles.cover} >
         <div style={styles.container}>
             <h2>LoginForm</h2>
             {error && <p style={styles.error}>{error}</p>}
@@ -83,10 +83,10 @@ const LoginForm: React.FC = () => {
 };
 
 const styles = {
-    cover: {
-        height: '500px',
-        maxWidth: '100%',
-    },
+  cover: {
+      height: '500px',
+      maxWidth: '100%',
+  },
   container: {
     maxWidth: '400px',
     margin: '100px auto',
@@ -94,6 +94,7 @@ const styles = {
     textAlign: 'center' as const,
     border: '1px solid #ccc',
     borderRadius: '5px',
+    backgroundColor: 'rgba(108, 122, 137, 0.8)',
   },
   inputGroup: {
     marginBottom: '15px',

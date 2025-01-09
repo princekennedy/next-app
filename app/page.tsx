@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <>
       <Topnav></Topnav>
-      <Banner message="A CUSTOM GOLF CLUB FITTING.YOUR GAME’S GAME-CHANGER." backgroundImage="https://via.placeholder.com/1500x500" />
+      <Banner message="A CUSTOM GOLF CLUB FITTING.YOUR GAME’S GAME-CHANGER." backgroundImage="/assets/fit-banner1.jpg" />
       <Promo message="" backgroundImage="/assets/100-full-bag-2025.svg" />
       <Footer></Footer>
     </>

@@ -109,6 +109,7 @@ const styles = {
     textAlign: 'center' as const,
     border: '1px solid #ccc',
     borderRadius: '5px',
+    backgroundColor: 'rgba(108, 122, 137, 0.8)',
   },
   inputGroup: {
     marginBottom: '15px',
