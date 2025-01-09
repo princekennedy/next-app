@@ -43,43 +43,83 @@ const FittingSchedule = () => {
     }
   };
 
+
   const renderCalendar = () => {
     const daysInMonth = new Date(2025, 1, 0).getDate(); // January 2025
+    const firstDayOfMonth = new Date(2025, 0, 1).getDay(); // Day of the week for Jan 1, 2025 (0 = Sunday, 1 = Monday, etc.)
     const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-
+  
+    // Days of the week header
+    const weekDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  
+    // Fill empty cells before the first day of the month
+    const leadingEmptyDays = Array.from({ length: firstDayOfMonth }, () => null);
+  
+    // Combine leading empty cells with actual days
+    const calendarDays = [...leadingEmptyDays, ...days];
+  
     return (
-
-    <div className="grid grid-cols-7 gap-4">
-        {days.map((day) => {
-
-        const currentDate = `2025-01-${day.toString().padStart(2, "0")}`;
-
-        const dayFittings = fittings.filter(
-            (fitting) => fitting.date === currentDate
-        );
-
-        return (
-            <div key={day} className="border p-2 rounded shadow-md flex flex-col items-center">
-            <div className="font-bold mb-2">{format(new Date(currentDate), "EEEE, MMM d")}</div>
-            {dayFittings.length > 0 ? (
-                <ul className="w-full">
-                    {dayFittings.map((fitting) => (
-                        <li key={fitting.id} className={`p-2 mb-2 rounded ${getStatusColor(fitting.status)}`}>
-                            <div className="text-sm font-medium">{fitting.time}</div>
-                            <div className="text-xs">{fitting.customerName}</div>
-                            <div className="text-xs italic">{fitting.status}</div>
-                        </li>
-                    ))}
-                </ul>
-            ) : (
-                <div className="text-gray-500 text-sm">No fittings</div>
-            )}
+      <div>
+        {/* Weekday header */}
+        <div className="grid grid-cols-7 gap-4 mb-4">
+          {weekDays.map((day) => (
+            <div key={day} className="font-bold text-center text-gray-800">
+              {day}
             </div>
-        );
-        })}
-    </div>
+          ))}
+        </div>
+  
+        {/* Calendar grid */}
+        <div className="grid grid-cols-7 gap-4">
+          {calendarDays.map((day, index) => {
+            if (!day) {
+              // Render empty cells for days before the first day of the month
+              return <div key={`empty-${index}`} className="border p-2 bg-gray-100"></div>;
+            }
+  
+            const currentDate = `2025-01-${day.toString().padStart(2, "0")}`;
+  
+            const dayFittings = fittings.filter(
+              (fitting) => fitting.date === currentDate
+            );
+  
+            return (
+              <div
+                key={day}
+                className="border p-2 rounded shadow-md flex flex-col items-center bg-white"
+              >
+                {/* Date only (no day of the week) */}
+                <div className="text-sm text-gray-500 mb-2">
+                  {format(new Date(currentDate), "MMM d")}
+                </div>
+  
+                {/* Fitting details */}
+                {dayFittings.length > 0 ? (
+                  <ul className="w-full">
+                    {dayFittings.map((fitting) => (
+                      <li
+                        key={fitting.id}
+                        className={`p-2 mb-2 rounded ${getStatusColor(
+                          fitting.status
+                        )}`}
+                      >
+                        <div className="text-sm font-medium">{fitting.time}</div>
+                        <div className="text-xs">{fitting.customerName}</div>
+                        <div className="text-xs italic">{fitting.status}</div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="text-gray-500 text-sm">No fittings</div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
     );
   };
+  
 
   return (
     <div className="flex h-screen">
