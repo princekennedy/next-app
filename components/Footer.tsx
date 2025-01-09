@@ -10,7 +10,6 @@ type Styles = {
 const Footer: React.FC = () => {
   const styles: Styles = {
     footer: {
-      backgroundColor: '#333',
       color: '#fff',
       padding: '20px 10px',
       fontFamily: 'Arial, sans-serif',
@@ -71,7 +70,7 @@ const Footer: React.FC = () => {
   };
 
   return (
-    <footer style={styles.footer}>
+    <footer style={styles.footer} className='bg-gray-700'>
       <div style={styles.container}>
         {/* Logo and Description */}
         <div style={styles.section}>

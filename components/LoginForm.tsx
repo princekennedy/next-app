@@ -1,38 +1,53 @@
 "use client"
-import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
 const LoginForm: React.FC = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
 
-  const [error, setError] = useState<string>('');
+    const [isClient, setIsClient] = useState(false);
+    const router = useRouter();
+  
+    useEffect(() => {
+      // This ensures the component only runs client-side
+      setIsClient(true);
+    }, []);
+
+    const [formData, setFormData] = useState({
+        email: '',
+        password: '',
+    });
+
+    const [error, setError] = useState<string>('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
 
-    const { email, password } = formData;
+        const { email, password } = formData;
 
-    // Simple validation
-    if (!email || !password) {
-      setError('All fields are required!');
-      return;
-    }
+        // Simple validation
+        if (!email || !password) {
+        setError('All fields are required!');
+        return;
+        }
 
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Invalid email format!');
-      return;
-    }
+        if (!/\S+@\S+\.\S+/.test(email)) {
+        setError('Invalid email format!');
+        return;
+        }
 
-    setError('');
-    console.log('LoginForm successful:', formData);
-    // Perform API call for loginForm
+        setError('');
+        console.log('LoginForm successful:', formData);
+        // Perform API call for loginForm
+    };
+
+
+  const loginNow = () => {
+    router.push('/home'); // Navigate to the "About" page
   };
 
   return (
@@ -63,7 +78,7 @@ const LoginForm: React.FC = () => {
                     style={styles.input}
                 />
                 </div>
-                <button type="submit" style={styles.button}>
+                <button type="submit" onClick={loginNow} style={styles.button}>
                     Login
                 </button>
             </form>
