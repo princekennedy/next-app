@@ -6,11 +6,6 @@ const LoginForm: React.FC = () => {
 
     const [isClient, setIsClient] = useState(false);
     const router = useRouter();
-  
-    useEffect(() => {
-      // This ensures the component only runs client-side
-      setIsClient(true);
-    }, []);
 
     const [formData, setFormData] = useState({
         email: '',
@@ -46,8 +41,8 @@ const LoginForm: React.FC = () => {
     };
 
 
-  const loginNow = () => {
-    router.push('/home'); // Navigate to the "About" page
+  const loadHome = () => {
+    router.push('/admin'); // Navigate to the "About" page
   };
 
   return (
@@ -78,7 +73,7 @@ const LoginForm: React.FC = () => {
                     style={styles.input}
                 />
                 </div>
-                <button type="submit" onClick={loginNow} style={styles.button}>
+                <button type="submit" onClick={loadHome} style={styles.button}>
                     Login
                 </button>
             </form>

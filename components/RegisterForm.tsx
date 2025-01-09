@@ -1,7 +1,15 @@
 "use client"
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 const RegisterForm: React.FC = () => {
+
+    const router = useRouter();
+
+    const loadHome = () => {
+        router.push('/admin'); // Navigate to the "About" page
+    };
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -80,7 +88,7 @@ const RegisterForm: React.FC = () => {
                     style={styles.input}
                 />
                 </div>
-                <button type="submit" style={styles.button}>
+                <button type="submit" onClick={loadHome} style={styles.button}>
                 RegisterForm
                 </button>
             </form>
