@@ -1,14 +1,17 @@
 "use client"
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const Topnav = () => {
   
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeLink, setActiveLink] = useState('');
 
-  const router = window.location;
+  useEffect(() => {
+    setActiveLink(window.location.pathname);
+  }, [window.location.pathname]);
 
-  const activeRoute = (path: string) => (router.pathname === path ? ' md:text-blue-700 ' : ' text-gray-500 ');
+  const activeRoute = (path: string) => (activeLink === path ? ' md:text-blue-700 ' : ' text-gray-500 ');
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
