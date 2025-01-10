@@ -23,14 +23,15 @@ const GetStartedPage = () => {
         <SideNav></SideNav>
         {/* Main Content */}
 
-        <div className="flex-1 p-6 bg-gray-100">
-          <Banner message="A CUSTOM GOLF CLUB FITTING.YOUR GAME’S GAME-CHANGER." backgroundImage="/assets/fit-banner1.jpg" />
+        <div className="flex-1 bg-gray-100">
+          <Banner message="Get Started" backgroundImage="/assets/fit-banner1.jpg" />
           <div className="getting-started-message p-4 border rounded shadow-lg">
-            <h2 className="text-xl font-bold mb-2">Getting Started</h2>
+            <h2 className="text-xl font-bold mb-2">Description</h2>
             {isEditing ? (
               <textarea
                 className="w-full p-2 border rounded"
                 value={message}
+                style={{height: "100px"}}
                 onChange={handleChange}
               />
             ) : (
