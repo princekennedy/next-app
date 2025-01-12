@@ -35,17 +35,12 @@ const FittingHistory = () => {
   return (
 
     <>
-    <div className="flex h-screen">
-        {/* Sidebar */}
-        <SideNav></SideNav>
-        {/* Main Content */}
 
-        <div className="flex-1 p-6 bg-gray-100">
                 <div className="fitting-history p-4 border rounded shadow-lg">
                 <h2 className="text-xl font-bold mb-4">Fitting History</h2>
                 <table className="table-auto w-full border-collapse border border-gray-200">
                     <thead>
-                    <tr className="bg-gray-100">
+                  <tr className="bg-gray-100">
                         <th className="border border-gray-300 px-4 py-2">Date</th>
                         <th className="border border-gray-300 px-4 py-2">Time</th>
                         <th className="border border-gray-300 px-4 py-2">Customer Name</th>
@@ -68,8 +63,7 @@ const FittingHistory = () => {
                     </tbody>
                 </table>
                 </div>
-            </div>
-        </div>
+  
     </>
   );
 };

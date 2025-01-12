@@ -4,6 +4,7 @@ import Topnav from '@/components/Topnav';
 import React from 'react';
 
 export default function Register() {
+  
 
   return (
     <>

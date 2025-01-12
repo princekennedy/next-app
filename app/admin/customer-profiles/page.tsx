@@ -1,7 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
-import SideNav from "@/components/SideNav";
+import { supabase } from "@/lib/supabase-client";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+
 
 interface Customer {
   id: number;
@@ -9,37 +12,49 @@ interface Customer {
   address: string;
   email: string;
   phone: string;
-  golfClubSize: string;
+  golf_club_size: string;
 }
 
 const CustomerProfiles: React.FC = () => {
   // Mock data for customer profiles
-  const [customers, setCustomers] = useState<Customer[]>([
-    {
-      id: 1,
-      name: "John Doe",
-      address: "123 Main St, Springfield",
-      email: "john.doe@example.com",
-      phone: "123-456-7890",
-      golfClubSize: "Standard",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      address: "456 Oak Ave, Metropolis",
-      email: "jane.smith@example.com",
-      phone: "987-654-3210",
-      golfClubSize: "Large",
-    },
-    {
-      id: 3,
-      name: "Alice Johnson",
-      address: "789 Pine Rd, Gotham",
-      email: "alice.johnson@example.com",
-      phone: "555-555-5555",
-      golfClubSize: "Medium",
-    },
-  ]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const router = useRouter();
+
+  const getUser = async()=> {
+      const {data: {user}} = await supabase.auth.getUser();
+
+      if(user){
+        return;
+      }else{
+        router.push("/login");
+      }
+  }
+
+
+
+  const [loading,setLoader] = useState(false);
+  useEffect(() => {
+    getUser();
+    getCustomers();
+
+  },[]);
+
+  const getCustomers = async () => {
+      setLoader(true);
+      try{
+        const response = await axios.get('/api/users');
+        if(response.status == 200){
+          setCustomers(response.data?.data);
+          setLoader(false);
+        }else{
+          console.log(response.data.errors)
+          setLoader(false);
+        }
+        
+      }catch(error){
+        console.log(error);
+      }
+  }
 
   const handleInputChange = (
     id: number,
@@ -54,11 +69,8 @@ const CustomerProfiles: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
-      <SideNav />
-      {/* Main Content */}
-      <div className="flex-1 p-6 bg-gray-100">
+
+      
         <div className="customer-profiles p-4 border rounded shadow-lg">
           <h2 className="text-xl font-bold mb-4">Customer Profiles</h2>
           <table className="table-auto w-full border-collapse border border-gray-200">
@@ -72,7 +84,12 @@ const CustomerProfiles: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {customers.map((customer) => (
+              { loading ? (
+                <div className="flex justify-center items-center">
+                    <h1 className="animate-pulse "> Loading...</h1>
+                </div>
+              ) : 
+              (customers.map((customer) => (
                 <tr key={customer.id}>
                   <td className="border border-gray-300 px-4 py-2">
                     <input
@@ -101,7 +118,7 @@ const CustomerProfiles: React.FC = () => {
                   <td className="border border-gray-300 px-4 py-2">
                     <input
                       type="email"
-                      value={customer.email}
+                      value={customer?.email}
                       onChange={(e) =>
                         handleInputChange(customer.id, "email", e.target.value)
                       }
@@ -111,7 +128,7 @@ const CustomerProfiles: React.FC = () => {
                   <td className="border border-gray-300 px-4 py-2">
                     <input
                       type="text"
-                      value={customer.phone}
+                      value={customer?.phone}
                       onChange={(e) =>
                         handleInputChange(customer.id, "phone", e.target.value)
                       }
@@ -121,7 +138,7 @@ const CustomerProfiles: React.FC = () => {
                   <td className="border border-gray-300 px-4 py-2">
                     <input
                       type="text"
-                      value={customer.golfClubSize}
+                      value={customer?.golf_club_size}
                       onChange={(e) =>
                         handleInputChange(
                           customer.id,
@@ -133,12 +150,12 @@ const CustomerProfiles: React.FC = () => {
                     />
                   </td>
                 </tr>
-              ))}
+              )))
+            }
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
+     
   );
 };
 

@@ -2,12 +2,47 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase-client";
+
 
 export default function SideNav() {
 
+   const router = useRouter();
     const [activeLink, setActiveLink] = useState('');
+    const [user,setUser]= useState({})
+
+
+    const getUserByID = async(id)=> {
+      const {data} = await supabase.from("users1").select("*").eq('user_id',id);
+      if(data){
+        setUser(data[0]);
+        // console.log(data);
+      }else{
+        console.log("failed to get user")
+      }
+  }
+    
+      const getUser = async()=> {
+          const {data: {user}} = await supabase.auth.getUser();
+          if(user){
+           getUserByID(user.id);
+          }else{
+            console.log("failed to get user")
+          }
+      }
+
+
+
+       const logout=async () => {
+         const { error}: any = await supabase.auth.signOut();
+         if(!error){
+          router.push('/login');
+         }
+
+       }
 
     useEffect(() => {
+        getUser();
       setActiveLink(window.location.pathname);
     }, [window.location.pathname]);
 
@@ -76,13 +111,13 @@ export default function SideNav() {
           </ul>
         </nav>
         <div className="p-4 border-t border-gray-700">
-          Welcome: Prince Kennedy
-          <Link
-            href="/login"
+          Welcome: { user?.name}
+          <button
+            onClick={() => { logout()}}
             className="block py-3 px-4 hover:bg-gray-700 transition"
           >
             Logout
-          </Link>
+          </button>
         </div>
       </div>
     );

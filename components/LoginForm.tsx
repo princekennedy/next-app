@@ -1,4 +1,5 @@
 "use client"
+import { supabase } from '@/lib/supabase-client';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
@@ -19,31 +20,28 @@ const LoginForm: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         const { email, password } = formData;
 
-        // Simple validation
-        if (!email || !password) {
-        setError('All fields are required!');
-        return;
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
+
+        // you will handle erorrs from the error object nziwi
+
+        if(data.session?.user){
+          router.push('/admin');
+        }else{
+          return alert(error?.message);
         }
 
-        if (!/\S+@\S+\.\S+/.test(email)) {
-        setError('Invalid email format!');
-        return;
-        }
-
-        setError('');
-        console.log('LoginForm successful:', formData);
-        // Perform API call for loginForm
     };
 
 
-  const loadHome = () => {
-    router.push('/admin'); // Navigate to the "About" page
-  };
+
 
   return (
     <div style={styles.cover} >
@@ -73,7 +71,7 @@ const LoginForm: React.FC = () => {
                     style={styles.input}
                 />
                 </div>
-                <button type="submit" onClick={loadHome} style={styles.button}>
+                <button type="submit"  style={styles.button}>
                     Login
                 </button>
             </form>

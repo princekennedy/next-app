@@ -1,14 +1,14 @@
 "use client"
+import { supabase } from '@/lib/supabase-client';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+
 
 const RegisterForm: React.FC = () => {
 
     const router = useRouter();
 
-    const loadHome = () => {
-        router.push('/admin'); // Navigate to the "About" page
-    };
+
 
   const [formData, setFormData] = useState({
     name: '',
@@ -23,31 +23,49 @@ const RegisterForm: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     const { name, email, password } = formData;
-
-    // Simple validation
-    if (!name || !email || !password) {
-      setError('All fields are required!');
+  
+    
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      phone: "0996662347", 
+    });
+  
+    if (authError) {
+      console.error("Sign-up error:", authError.message);
       return;
     }
-
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Invalid email format!');
-      return;
+  
+    const userId = authData.user?.id; 
+  
+    if (userId) {
+      
+      const { error: dbError } = await supabase.from('users1').insert({
+        user_id:userId,
+        name,
+        email,
+        phone: "0996662347",
+        address: "Chilomoni",
+        golf_club_size:"single"
+      });
+  
+      if (dbError) {
+        console.error("Database insert error:", dbError.message);
+        return;
+      }
+      router.push('/login');
+    
+    } else {
+      console.error("Failed to retrieve user ID from Auth.");
     }
-
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long!');
-      return;
-    }
-
-    setError('');
-    console.log('RegisterForm successful:', formData);
-    // Perform API call for RegisterForm
   };
+  
+
 
   return (
     <div style={styles.cover}>
@@ -88,7 +106,7 @@ const RegisterForm: React.FC = () => {
                     style={styles.input}
                 />
                 </div>
-                <button type="submit" onClick={loadHome} style={styles.button}>
+                <button type="submit"  style={styles.button}>
                 RegisterForm
                 </button>
             </form>
