@@ -41,7 +41,7 @@ export default function CustomerSideNav() {
     }
 
     useEffect(() => {
-        getUser();
+      getUser();
       setActiveLink(window.location.pathname);
     }, [window.location.pathname]);
 
@@ -50,12 +50,12 @@ export default function CustomerSideNav() {
     return (
       <div className="w-64 bg-gray-700 text-white flex flex-col">
         <div className="p-4 text-lg font-bold border-b border-gray-700">
-          My Account
+          My Account {activeLink}
         </div>
         <nav className="flex-1">
           <ul>
             <li>
-              <Link href="/admin" className={ activeRoute('/admin') + " block py-3 px-4 hover:bg-gray-700 transition" }>
+              <Link href="/admin" className={ activeRoute('/customer') + " block py-3 px-4 hover:bg-gray-700 transition" }>
                 Home
               </Link>
             </li>

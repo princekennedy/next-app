@@ -7,3 +7,11 @@ export interface User {
     phone: string;
     golf_club_size: string;
 }
+
+export interface MessateData {
+    id?: number;
+    key: string;
+    value: string;
+}
+
+
