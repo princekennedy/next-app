@@ -1,6 +1,7 @@
 
 "use client"
-import { MessateData } from '@/app/models/interfaces';
+import { getPropertyByKey, getUser } from '@/app/api/users/route';
+import { MessateData, User } from '@/app/models/interfaces';
 import Banner from '@/components/Banner';
 import Promo from '@/components/Promo';
 import SideNav from '@/components/SideNav'
@@ -9,16 +10,8 @@ import React, { useEffect, useState } from 'react'
 
 const GetStartedPage = () => {
   const [message, setMessage] = useState("");
-  const [userId, setUserId] = useState("")
+  const [user, setUser] = useState<User| null>(null);
 
-  const getData = async()=> {
-      const {data} = await supabase.from("properties").select("*").eq('key','get-started');
-      if(data?.length){
-          setMessage(data[0].value);
-      }else{
-        createData();
-      }
-  }
 
   const createData = async () => {
     try {
@@ -50,8 +43,7 @@ const GetStartedPage = () => {
         value: message,
       }
       const {data} = await supabase.from("properties").update(messateData).eq('key', 'get-started');
-      console.log(data)
-      getData();
+      initaliseDataPull();
   }
 
   const [isEditing, setIsEditing] = useState(false);
@@ -64,14 +56,37 @@ const GetStartedPage = () => {
   const handleChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {setMessage(e.target.value);};
 
 
+  /**
+   * Initialise the data pull for the get started page.
+   * Fetches the current user and the get started message from the database.
+   */
+  const initaliseDataPull = () => {
+    // Fetch the current user
+    getUser().then((user) => {
+      if (user) {
+        setUser(user);
+      }
+    });
+
+    // Fetch the get started message from the database
+    getPropertyByKey('get-started').then((data) => {
+      if (data.length) {
+        // Set the message if it exists
+        setMessage(data[0].value);
+      } else {
+        // Set a default message if it doesn't exist
+        setMessage('');
+      }
+    });
+  }
   
   useEffect(() => {
-    getData();
-  },[]);
+    initaliseDataPull();
+  }, []);
 
   return (
     <>
-      <Banner message="Get Started" backgroundImage="/assets/fit-banner1.jpg" />
+      <Banner message={ !user ? "Loading ..." : "Welcome: " + (user?.name) } backgroundImage="/assets/fit-banner1.jpg" />
       <div className="getting-started-message p-4 border rounded shadow-lg">
         <h2 className="text-xl font-bold mb-2">Description</h2>
         {isEditing ? (

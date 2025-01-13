@@ -68,15 +68,33 @@ export async function getCustomers() {
 }
 
 
+/**
+ * Updates a user in the "users1" table in the database with the specified user object.
+ * 
+ * @param {User} customer - The user object to update in the database.
+ * @returns {Promise<string>} A string indicating the success or failure of the update operation
+ */
 export async function updateCustomerApi(customer: User) {
+    // Update the user in the database with the specified user object
     const { error: dbError } = await supabase.from('users1').update(customer).eq('user_id', customer.user_id);
+
+    // If an error occurs, return the error message
     if (dbError) {
-     return dbError.message;
+        return dbError.message;
     }
+
+    // Return a success message if the update is successful
     return customer.name + ' is updated successfully';
 }
 
-
+export async function getPropertyByKey(key: string) {
+      const {data} = await supabase.from("properties").select("*").eq('key', key);
+      if(data){
+          return data;
+      }else{
+        return [];
+      }
+  }
 
 
 // export async function GET() {
