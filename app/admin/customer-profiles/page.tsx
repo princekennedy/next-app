@@ -1,6 +1,6 @@
 "use client";
 
-import { getUsers } from "@/app/api/users/route";
+import { getUsers, updateCustomerApi } from "@/app/api/users/route";
 import { User } from "@/app/models/interfaces";
 import { supabase } from "@/lib/supabase-client";
 import axios from "axios";
@@ -42,25 +42,10 @@ const CustomerProfiles: React.FC = () => {
 
   const updateCustomer = async (customer: User) => {
     try {
-      // Destructure the user fields from the `customer` object
-      const { name, email, phone, address, golf_club_size, user_id } = customer;
-      // Update user in the database
-      const { error: dbError } = await supabase
-        .from('users1')
-        .update({
-          name,
-          email,
-          phone,
-          address,
-          golf_club_size,
-        })
-        .eq('user_id', user_id); // Filter by the user_id
-  
-      if (dbError) {
-        throw new Error(dbError.message);
-      }
-      setMessage('Customer updated successfully');
-      initaliseDataPull();
+      updateCustomerApi(customer).then( res => {
+        setMessage(res);
+        initaliseDataPull();
+      })
     } catch (error) {
       setMessage('Error updating customer:' + error);
     }

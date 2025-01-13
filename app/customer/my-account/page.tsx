@@ -1,6 +1,6 @@
 "use client";
 
-import { getUser } from "@/app/api/users/route";
+import { getUser, updateCustomerApi } from "@/app/api/users/route";
 import { User } from "@/app/models/interfaces";
 import { useEffect, useState } from "react";
 
@@ -16,6 +16,7 @@ const MyProfile = () => {
 
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -31,24 +32,16 @@ const MyProfile = () => {
     e.preventDefault();
     setError(null);
     setSuccessMessage(null);
-
     // Form validation
     if (!formData.name || !formData.email || !formData.phone || !formData?.golf_club_size) {
       setError("Please fill out all required fields.");
       return;
     }
-
-    try {
-      // Replace this with your API call or database integration
-      console.log("Updating profile with:", formData);
-
-      // Simulate success response
-      setTimeout(() => {
-        setSuccessMessage("Profile updated successfully!");
-      }, 500);
-    } catch (err) {
-      setError("An error occurred while updating the profile. Please try again.");
-    }
+    setLoading(true);
+    updateCustomerApi(formData).then( res => {
+      setSuccessMessage(res);
+      setLoading(false);
+    })
   };
 
   const initaliseDataPull = () => {
@@ -156,11 +149,8 @@ const MyProfile = () => {
         {successMessage && <p className="text-green-500 text-sm">{successMessage}</p>}
 
         {/* Submit Button */}
-        <button
-          type="submit"
-          className="w-full py-2 px-4 bg-blue-500 text-white font-medium rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          Save Changes
+        <button type="submit" className="w-full py-2 px-4 bg-blue-500 text-white font-medium rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500" disabled={loading}>
+          {loading ? "Loading..." : "Update Changes"}
         </button>
       </form>
     </div>
