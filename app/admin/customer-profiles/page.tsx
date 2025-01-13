@@ -1,5 +1,6 @@
 "use client";
 
+import { getUsers } from "@/app/api/users/route";
 import { User } from "@/app/models/interfaces";
 import { supabase } from "@/lib/supabase-client";
 import axios from "axios";
@@ -14,26 +15,17 @@ const CustomerProfiles: React.FC = () => {
   const [loading,setLoader] = useState(false);
   const [message,setMessage] = useState<string>('');
 
-  useEffect(() => {
-    getCustomers();
-  },[]);
-
-  const getCustomers = async () => {
+    const initaliseDataPull = () => {
       setLoader(true);
-      try{
-        const response = await axios.get('/api/users');
-        if(response.status == 200){
-          setCustomers(response.data?.data);
-          setLoader(false);
-        }else{
-          setMessage(response.data.errors)
-          setLoader(false);
-        }
-        
-      }catch(error){
-        console.log(error);
-      }
-  }
+      getUsers().then( data =>{
+        setCustomers(data);
+        setLoader(false);
+      });
+    }
+    
+    useEffect(() => {
+      initaliseDataPull();
+    }, []);
 
   const handleInputChange = (
     id: number,
@@ -68,7 +60,7 @@ const CustomerProfiles: React.FC = () => {
         throw new Error(dbError.message);
       }
       setMessage('Customer updated successfully');
-      getCustomers();
+      initaliseDataPull();
     } catch (error) {
       setMessage('Error updating customer:' + error);
     }
@@ -100,7 +92,7 @@ const CustomerProfiles: React.FC = () => {
                   </td>
                 </tr>
               ) : 
-              (customers.map((customer) => (
+              (customers.map((customer: any) => (
                 <tr key={customer.id}>
                   <td className="border border-gray-300 px-4 py-2">
                     <input

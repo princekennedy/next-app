@@ -6,7 +6,10 @@ import React, { useState } from 'react';
 
 const RegisterForm: React.FC = () => {
   const router = useRouter();
-  
+    
+  const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -16,8 +19,6 @@ const RegisterForm: React.FC = () => {
     golf_club_size: '',
     type: 'customer',
   });
-  
-  const [error, setError] = useState<string>('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
@@ -25,6 +26,7 @@ const RegisterForm: React.FC = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    setLoading(true);
     e.preventDefault();
     const { name, email, password, phone, golf_club_size, address, type } = formData;
 
@@ -56,12 +58,14 @@ const RegisterForm: React.FC = () => {
 
       if (dbError) {
         setError(dbError.message);
+        setLoading(false)
         return;
       }
 
       // Redirect to login page
       router.push('/login');
     } else {
+      setLoading(false)
       setError('Failed to retrieve user ID from Auth.');
     }
   };
@@ -142,8 +146,8 @@ const RegisterForm: React.FC = () => {
             />
           </div>
           <div style={{ width: '100%', float: 'left', textAlign: 'left' }}>
-            <button type="submit" style={styles.button}>
-              Register
+            <button type="submit" className="p-2" style={styles.button} disabled={loading}>
+              {loading ? "Loading..." : "Register"}
             </button>
             {error && <span style={styles.error}>{error}</span>}
           </div>

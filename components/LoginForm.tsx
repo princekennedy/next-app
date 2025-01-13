@@ -15,6 +15,8 @@ const LoginForm: React.FC = () => {
   });
 
   const [error, setError] = useState<string| null>('');
+  const [loading, setLoading] = useState(false);
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -24,18 +26,20 @@ const LoginForm: React.FC = () => {
   const loggingUser = async(id: string)=> {
     const {data} = await supabase.from("users1").select("*").eq('user_id',id);
     if(data){
-      console.log(data)
+      setLoading(false);
       if(data[0].type == 'admin') {
         router.push('/admin');
       } else {
         router.push('/customer');
       }
     }else{
+      setLoading(false);
       setError("failed to get user")
     }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
+      setLoading(true);
       e.preventDefault();
 
       const { email, password } = formData;
@@ -50,6 +54,7 @@ const LoginForm: React.FC = () => {
       if(data.session?.user){
         loggingUser(data.session.user.id)
       }else{
+        setLoading(false);
         return setError(error?.message ?? '');
       }
 
@@ -86,8 +91,8 @@ const LoginForm: React.FC = () => {
                   />
                 </div>
                 <div style={{textAlign: 'left'}}>
-                  <button type="submit" className="p-2" style={styles.button}>
-                      Login
+                  <button type="submit" className="p-2" style={styles.button} disabled={loading}>
+                    {loading ? "Loading..." : "Login"}
                   </button>
                   {error && <span style={styles.error}>{error}</span>}
                 </div>
