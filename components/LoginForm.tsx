@@ -1,44 +1,59 @@
 "use client"
+import { User } from '@/app/models/interfaces';
 import { supabase } from '@/lib/supabase-client';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 const LoginForm: React.FC = () => {
 
-    const [isClient, setIsClient] = useState(false);
-    const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
+  const router = useRouter();
 
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-    });
+  const [formData, setFormData] = useState({
+      email: '',
+      password: '',
+  });
 
-    const [error, setError] = useState<string>('');
+  const [error, setError] = useState<string| null>('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+  const loggingUser = async(id: string)=> {
+    const {data} = await supabase.from("users1").select("*").eq('user_id',id);
+    if(data){
+      console.log(data)
+      if(data[0].type == 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/customer');
+      }
+    }else{
+      setError("failed to get user")
+    }
+  }
 
-        const { email, password } = formData;
+  const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
 
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password
-        });
+      const { email, password } = formData;
 
-        // you will handle erorrs from the error object nziwi
+      const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+      });
 
-        if(data.session?.user){
-          router.push('/admin');
-        }else{
-          return alert(error?.message);
-        }
+      // you will handle erorrs from the error object nziwi
 
-    };
+      if(data.session?.user){
+        loggingUser(data.session.user.id)
+      }else{
+        return setError(error?.message ?? '');
+      }
+
+  };
 
 
 
@@ -47,33 +62,35 @@ const LoginForm: React.FC = () => {
     <div style={styles.cover} >
         <div style={styles.container}>
             <h2>LoginForm</h2>
-            {error && <p style={styles.error}>{error}</p>}
             <form onSubmit={handleSubmit}>
                 <div style={styles.inputGroup}>
-                <label htmlFor="email">Email:</label>
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    style={styles.input}
-                />
+                  <label htmlFor="email">Email:</label>
+                  <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      style={styles.input}
+                  />
                 </div>
                 <div style={styles.inputGroup}>
-                <label htmlFor="password">Password:</label>
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    style={styles.input}
-                />
+                  <label htmlFor="password">Password:</label>
+                  <input
+                      type="password"
+                      id="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      style={styles.input}
+                  />
                 </div>
-                <button type="submit"  style={styles.button}>
-                    Login
-                </button>
+                <div style={{textAlign: 'left'}}>
+                  <button type="submit" className="p-2" style={styles.button}>
+                      Login
+                  </button>
+                  {error && <span style={styles.error}>{error}</span>}
+                </div>
             </form>
         </div>
     </div>
@@ -107,14 +124,16 @@ const styles = {
   button: {
     padding: '10px 15px',
     backgroundColor: '#007BFF',
+    textAlign: 'left' as const,
     color: '#fff',
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
   },
   error: {
-    color: 'red',
+    color: '#a11616',
     marginBottom: '10px',
+    margin: '0px 20px',
   },
 };
 

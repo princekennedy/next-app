@@ -1,42 +1,21 @@
 "use client";
 
+import { User } from "@/app/models/interfaces";
 import { supabase } from "@/lib/supabase-client";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 
-interface Customer {
-  id: number;
-  name: string;
-  address: string;
-  email: string;
-  phone: string;
-  golf_club_size: string;
-}
-
 const CustomerProfiles: React.FC = () => {
   // Mock data for customer profiles
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const router = useRouter();
-
-  const getUser = async()=> {
-      const {data: {user}} = await supabase.auth.getUser();
-
-      if(user){
-        return;
-      }else{
-        router.push("/login");
-      }
-  }
-
-
+  const [customers, setCustomers] = useState<User[]>([]);
 
   const [loading,setLoader] = useState(false);
-  useEffect(() => {
-    getUser();
-    getCustomers();
+  const [message,setMessage] = useState<string>('');
 
+  useEffect(() => {
+    getCustomers();
   },[]);
 
   const getCustomers = async () => {
@@ -47,7 +26,7 @@ const CustomerProfiles: React.FC = () => {
           setCustomers(response.data?.data);
           setLoader(false);
         }else{
-          console.log(response.data.errors)
+          setMessage(response.data.errors)
           setLoader(false);
         }
         
@@ -58,7 +37,7 @@ const CustomerProfiles: React.FC = () => {
 
   const handleInputChange = (
     id: number,
-    field: keyof Customer,
+    field: keyof User,
     value: string
   ) => {
     setCustomers((prevCustomers) =>
@@ -66,6 +45,33 @@ const CustomerProfiles: React.FC = () => {
         customer.id === id ? { ...customer, [field]: value } : customer
       )
     );
+  };
+
+
+  const updateCustomer = async (customer: User) => {
+    try {
+      // Destructure the user fields from the `customer` object
+      const { name, email, phone, address, golf_club_size, user_id } = customer;
+      // Update user in the database
+      const { error: dbError } = await supabase
+        .from('users1')
+        .update({
+          name,
+          email,
+          phone,
+          address,
+          golf_club_size,
+        })
+        .eq('user_id', user_id); // Filter by the user_id
+  
+      if (dbError) {
+        throw new Error(dbError.message);
+      }
+      setMessage('Customer updated successfully');
+      getCustomers();
+    } catch (error) {
+      setMessage('Error updating customer:' + error);
+    }
   };
 
   return (
@@ -81,13 +87,18 @@ const CustomerProfiles: React.FC = () => {
                 <th className="border border-gray-300 px-4 py-2">Email</th>
                 <th className="border border-gray-300 px-4 py-2">Phone</th>
                 <th className="border border-gray-300 px-4 py-2">Golf Club Size</th>
+                <th className="border border-gray-300 px-4 py-2">Action</th>
               </tr>
             </thead>
             <tbody>
               { loading ? (
-                <div className="flex justify-center items-center">
-                    <h1 className="animate-pulse "> Loading...</h1>
-                </div>
+                <tr key="loader">
+                  <td colSpan={6}>
+                    <div className="flex justify-center items-center">
+                        <h1 className="animate-pulse "> Loading...</h1>
+                    </div>
+                  </td>
+                </tr>
               ) : 
               (customers.map((customer) => (
                 <tr key={customer.id}>
@@ -142,18 +153,24 @@ const CustomerProfiles: React.FC = () => {
                       onChange={(e) =>
                         handleInputChange(
                           customer.id,
-                          "golfClubSize",
+                          'golf_club_size',
                           e.target.value
                         )
                       }
                       className="w-full px-2 py-1 border rounded"
                     />
                   </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    <button onClick={() => updateCustomer(customer)}>Update</button>
+                  </td>
                 </tr>
               )))
             }
             </tbody>
           </table>
+          <p className="text-green-400">
+            {message}
+          </p>
         </div>
      
   );

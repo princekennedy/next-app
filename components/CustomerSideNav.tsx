@@ -3,43 +3,42 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase-client";
+import { User } from "@/app/models/interfaces";
 
 
-export default function SideNav() {
+export default function CustomerSideNav() {
 
-   const router = useRouter();
+    const router = useRouter();
     const [activeLink, setActiveLink] = useState('');
-    const [user,setUser]= useState({})
-
-
-    const getUserByID = async(id)=> {
-      const {data} = await supabase.from("users1").select("*").eq('user_id',id);
-      if(data){
-        setUser(data[0]);
-        // console.log(data);
-      }else{
-        console.log("failed to get user")
-      }
-  }
-    
-      const getUser = async()=> {
-          const {data: {user}} = await supabase.auth.getUser();
-          if(user){
-           getUserByID(user.id);
-          }else{
+    const [user,setUser]= useState<User| null>(null)
+    const getUserByID = async(id: string)=> {
+        const {data} = await supabase.from("users1").select("*").eq('user_id',id);
+        console.log(id)
+        if(data){
+            setUser(data[0]);
+        }else{
             console.log("failed to get user")
-          }
-      }
+        }
+    }
+    
+    const getUser = async()=> {
+        const {data: {user}} = await supabase.auth.getUser();
+        if(user){
+        getUserByID(user.id);
+        }else{
+        console.log("failed to get user")
+        }
+    }
 
 
 
-       const logout=async () => {
+    const logout=async () => {
          const { error}: any = await supabase.auth.signOut();
          if(!error){
           router.push('/login');
          }
 
-       }
+    }
 
     useEffect(() => {
         getUser();

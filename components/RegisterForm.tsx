@@ -1,116 +1,154 @@
-"use client"
+"use client";
+
 import { supabase } from '@/lib/supabase-client';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
-
 const RegisterForm: React.FC = () => {
-
-    const router = useRouter();
-
-
-
+  const router = useRouter();
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
+    phone: '',
+    address: '',
+    golf_club_size: '',
+    type: 'customer',
   });
-
+  
   const [error, setError] = useState<string>('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
-    const { name, email, password } = formData;
-  
-    
+    const { name, email, password, phone, golf_club_size, address, type } = formData;
+
+    // Sign up with Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
-      phone: "0996662347", 
+      phone,
     });
-  
+
     if (authError) {
-      console.error("Sign-up error:", authError.message);
+      setError(authError.message);
       return;
     }
-  
-    const userId = authData.user?.id; 
-  
+
+    const userId = authData.user?.id;
+
     if (userId) {
-      
+      // Insert user into the database
       const { error: dbError } = await supabase.from('users1').insert({
-        user_id:userId,
+        user_id: userId,
         name,
         email,
-        phone: "0996662347",
-        address: "Chilomoni",
-        golf_club_size:"single"
+        phone,
+        address,
+        golf_club_size,
+        type,
       });
-  
+
       if (dbError) {
-        console.error("Database insert error:", dbError.message);
+        setError(dbError.message);
         return;
       }
+
+      // Redirect to login page
       router.push('/login');
-    
     } else {
-      console.error("Failed to retrieve user ID from Auth.");
+      setError('Failed to retrieve user ID from Auth.');
     }
   };
-  
-
 
   return (
     <div style={styles.cover}>
-        <div style={styles.container}>
-            <h2>RegisterForm</h2>
-            {error && <p style={styles.error}>{error}</p>}
-            <form onSubmit={handleSubmit}>
-                <div style={styles.inputGroup}>
-                <label htmlFor="name">Name:</label>
-                <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    style={styles.input}
-                />
-                </div>
-                <div style={styles.inputGroup}>
-                <label htmlFor="email">Email:</label>
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    style={styles.input}
-                />
-                </div>
-                <div style={styles.inputGroup}>
-                <label htmlFor="password">Password:</label>
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    style={styles.input}
-                />
-                </div>
-                <button type="submit"  style={styles.button}>
-                RegisterForm
-                </button>
-            </form>
-        </div>
+      <div style={styles.container}>
+        <h2>Register</h2>
+        <form onSubmit={handleSubmit}>
+          <div style={styles.inputGroup}>
+            <label htmlFor="name">Name:</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              style={styles.input}
+            />
+          </div>
+          <div style={styles.inputGroup}>
+            <label htmlFor="phone">Phone:</label>
+            <input
+              type="text"
+              id="phone"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              style={styles.input}
+            />
+          </div>
+          <div style={styles.inputGroup}>
+            <label htmlFor="golf_club_size">Golf Club Size:</label>
+            <select
+              id="golf_club_size"
+              name="golf_club_size"
+              value={formData.golf_club_size}
+              onChange={handleChange}
+              style={styles.input}
+            >
+              <option>Full Bag Fitting</option>
+              <option>Full Bag Fitting Minus Putter</option>
+              <option>Long Game Fitting</option>
+              <option>Driver Fitting</option>
+            </select>
+          </div>
+          <div style={styles.inputGroup}>
+            <label htmlFor="email">Email:</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              style={styles.input}
+            />
+          </div>
+          <div style={styles.inputGroup}>
+            <label htmlFor="password">Password:</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              style={styles.input}
+            />
+          </div>
+          <div style={styles.inputGroup}>
+            <label htmlFor="address">address:</label>
+            <input
+              type="address"
+              id="address"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              style={styles.input}
+            />
+          </div>
+          <div style={{ width: '100%', float: 'left', textAlign: 'left' }}>
+            <button type="submit" style={styles.button}>
+              Register
+            </button>
+            {error && <span style={styles.error}>{error}</span>}
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
@@ -121,7 +159,8 @@ const styles = {
     maxWidth: '100%',
   },
   container: {
-    maxWidth: '400px',
+    height: '400px',
+    maxWidth: '600px',
     margin: '50px auto',
     padding: '20px',
     textAlign: 'center' as const,
@@ -130,8 +169,10 @@ const styles = {
     backgroundColor: 'rgba(108, 122, 137, 0.8)',
   },
   inputGroup: {
-    marginBottom: '15px',
     textAlign: 'left' as const,
+    width: '50%',
+    float: 'left' as const,
+    padding: '15px',
   },
   input: {
     width: '100%',
@@ -146,6 +187,7 @@ const styles = {
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
+    margin: '0 15px',
   },
   error: {
     color: 'red',
